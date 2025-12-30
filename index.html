@@ -27,6 +27,7 @@ body{
   justify-content:center;
   text-align:center;
   z-index:2;
+  padding:20px;
 }
 
 h1{
@@ -56,6 +57,16 @@ p{
   animation:pop 1s ease forwards;
 }
 
+#message{
+  display:none;
+  margin-top:20px;
+  max-width:450px;
+  font-size:1rem;
+  line-height:1.6;
+  color:#ffe6f6;
+  animation:fadeIn 2s forwards;
+}
+
 button{
   margin-top:25px;
   padding:12px 30px;
@@ -78,6 +89,11 @@ button{
   to{transform:scale(1);opacity:1}
 }
 
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
 /* Floating hearts */
 .heart{
   position:absolute;
@@ -91,11 +107,17 @@ button{
   to{transform:translateY(-10vh);opacity:0}
 }
 
-/* Explosion particles */
-.particle{
+/* Sparkle */
+.sparkle{
   position:absolute;
   font-size:14px;
   pointer-events:none;
+  animation:spark 1s linear forwards;
+}
+
+@keyframes spark{
+  from{opacity:1;transform:scale(1)}
+  to{opacity:0;transform:scale(0)}
 }
 
 /* Fireworks */
@@ -118,16 +140,18 @@ canvas{
   <p>I hope this year brings us closer 🌸</p>
 
   <button onclick="startLove()">Tap Here 💕</button>
+
   <div id="love">I Love You ❤️</div>
+  <div id="message"></div>
 </div>
 
-<!-- Romantic Music -->
+<!-- Romantic Music (Plays ONLY after click) -->
 <audio id="music" loop>
-  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0d1a2d5c9f.mp3" type="audio/mpeg">
+  <source src="https://cdn.pixabay.com/audio/2023/03/06/audio_5e2c6db0b1.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-// HEART CREATION
+// HEARTS
 function createHeart(){
   const h=document.createElement("div");
   h.className="heart";
@@ -135,40 +159,42 @@ function createHeart(){
   h.style.left=Math.random()*100+"vw";
   h.style.animationDuration=(4+Math.random()*3)+"s";
   document.body.appendChild(h);
-
-  h.onclick=(e)=>explode(e.clientX,e.clientY);
-
   setTimeout(()=>h.remove(),7000);
 }
 setInterval(createHeart,300);
 
-// EXPLOSION
-function explode(x,y){
-  for(let i=0;i<12;i++){
-    const p=document.createElement("div");
-    p.className="particle";
-    p.innerHTML="💖";
-    p.style.left=x+"px";
-    p.style.top=y+"px";
-    document.body.appendChild(p);
-
-    const angle=Math.random()*Math.PI*2;
-    const dist=Math.random()*80;
-
-    p.animate([
-      {transform:"translate(0,0)",opacity:1},
-      {transform:`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`,opacity:0}
-    ],{duration:700});
-
-    setTimeout(()=>p.remove(),700);
-  }
-}
-
-// LOVE BUTTON
+// LOVE ACTION
 function startLove(){
   document.getElementById("love").style.display="block";
   document.getElementById("music").play();
+
+  const msg = "From the first smile to every little moment, you made my year brighter. I wish to start this new year holding your hand, writing our story together, one heartbeat at a time. 💞";
+  const box=document.getElementById("message");
+  box.style.display="block";
+  typeText(msg, box);
 }
+
+// TYPEWRITER
+function typeText(text, el){
+  let i=0;
+  el.innerHTML="";
+  const interval=setInterval(()=>{
+    el.innerHTML+=text[i];
+    i++;
+    if(i>=text.length) clearInterval(interval);
+  },40);
+}
+
+// SPARKLE CURSOR
+document.addEventListener("mousemove",e=>{
+  const s=document.createElement("div");
+  s.className="sparkle";
+  s.innerHTML="✨";
+  s.style.left=e.pageX+"px";
+  s.style.top=e.pageY+"px";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),1000);
+});
 
 // FIREWORKS
 const canvas=document.getElementById("fireworks");
@@ -178,7 +204,7 @@ canvas.height=innerHeight;
 let parts=[];
 
 function firework(x,y){
-  for(let i=0;i<50;i++){
+  for(let i=0;i<60;i++){
     parts.push({
       x,y,
       a:Math.random()*Math.PI*2,
