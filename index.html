@@ -213,7 +213,7 @@ canvas{
 
 <div class="center">
   <h1>Happy New Year ✨</h1>
-  <div class="name" id="name"></div>
+  <div class="name" id="name">Dear </div>
   <p>This year felt beautiful because of you</p>
   <p>I hope this year brings us closer 🌸</p>
   <button onclick="startLove()">Tap Here 💕</button>
@@ -246,13 +246,15 @@ canvas{
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-// NAME TYPING
-const nameText="Dear Lipsy 💖";
-let ni=0;
+// NAME TYPING (Dear visible immediately)
+const nameEl = document.getElementById("name");
+const nameText = "Lipsy 💖";
+let ni = 0;
+
 (function typeName(){
-  if(ni<nameText.length){
-    name.innerHTML+=nameText[ni++];
-    setTimeout(typeName,120);
+  if(ni < nameText.length){
+    nameEl.innerHTML += nameText[ni++];
+    setTimeout(typeName, 120);
   }
 })();
 
