@@ -28,6 +28,7 @@ body{
   justify-content:center;
   text-align:center;
   z-index:2;
+  padding:20px;
 }
 
 h1{
@@ -59,6 +60,24 @@ button{
   box-shadow:0 0 25px #ff4ecd;
 }
 
+/* LOVE TEXT */
+#love{
+  display:none;
+  margin-top:20px;
+  font-family:'Pacifico',cursive;
+  font-size:3rem;
+  color:#ff9de2;
+  animation:pop 1s forwards, glow 2s infinite alternate;
+}
+
+#message{
+  display:none;
+  margin-top:15px;
+  max-width:450px;
+  line-height:1.6;
+  color:#ffe6f6;
+}
+
 /* HEARTS */
 .heart{
   position:absolute;
@@ -70,6 +89,18 @@ button{
 @keyframes floatUp{
   from{transform:translateY(100vh)}
   to{transform:translateY(-10vh);opacity:0}
+}
+
+/* SPARKLE */
+.sparkle{
+  position:absolute;
+  font-size:14px;
+  pointer-events:none;
+  animation:spark 1s linear forwards;
+}
+@keyframes spark{
+  from{opacity:1}
+  to{opacity:0;transform:scale(0)}
 }
 
 /* LOVE CARD */
@@ -130,7 +161,7 @@ button{
   font-size:1.9rem;
 }
 
-/* BACK – HANDWRITTEN */
+/* BACK */
 .card-back{
   background:
     linear-gradient(rgba(255,255,255,0.25),rgba(255,255,255,0.25)),
@@ -169,6 +200,10 @@ canvas{
   from{text-shadow:0 0 10px #ff4ecd}
   to{text-shadow:0 0 40px #ff9de2}
 }
+@keyframes pop{
+  from{transform:scale(0)}
+  to{transform:scale(1)}
+}
 </style>
 </head>
 
@@ -182,6 +217,9 @@ canvas{
   <p>This year felt beautiful because of you</p>
   <p>I hope this year brings us closer 🌸</p>
   <button onclick="startLove()">Tap Here 💕</button>
+
+  <div id="love">I Love You ❤️</div>
+  <div id="message"></div>
 </div>
 
 <!-- LOVE CARD -->
@@ -203,7 +241,7 @@ canvas{
   </div>
 </div>
 
-<!-- YOUTUBE -->
+<!-- YOUTUBE MUSIC -->
 <div id="player" style="display:none"></div>
 <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -218,7 +256,7 @@ let ni=0;
   }
 })();
 
-// FLOATING HEARTS (REOPEN CARD)
+// FLOATING HEARTS + REOPEN CARD
 setInterval(()=>{
   const h=document.createElement("div");
   h.className="heart";
@@ -230,9 +268,19 @@ setInterval(()=>{
   setTimeout(()=>h.remove(),7000);
 },300);
 
+// SPARKLE CURSOR
+document.addEventListener("mousemove",e=>{
+  const s=document.createElement("div");
+  s.className="sparkle";
+  s.innerHTML="✨";
+  s.style.left=e.pageX+"px";
+  s.style.top=e.pageY+"px";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),1000);
+});
+
 // CARD
 function flipCard(){ card.classList.toggle("open"); }
-
 function closeCard(e){
   e.stopPropagation();
   if(!card.classList.contains("open")) return;
@@ -267,8 +315,8 @@ canvas.width=innerWidth;
 canvas.height=innerHeight;
 let parts=[];
 function explode(x,y){
-  for(let i=0;i<80;i++){
-    parts.push({x,y,a:Math.random()*6.28,s:Math.random()*5+2,l:80});
+  for(let i=0;i<90;i++){
+    parts.push({x,y,a:Math.random()*6.28,s:Math.random()*5+2,l:90});
   }
 }
 function animate(){
@@ -289,6 +337,17 @@ animate();
 function startLove(){
   player.playVideo();
   fadeInMusic();
+
+  document.getElementById("love").style.display="block";
+  const msg="From the first smile to every little moment, you made my year brighter. I wish to start this new year holding your hand, writing our story together, one heartbeat at a time. 💞";
+  const box=document.getElementById("message");
+  box.style.display="block";
+  let i=0;
+  const t=setInterval(()=>{
+    box.innerHTML+=msg[i++];
+    if(i>=msg.length) clearInterval(t);
+  },40);
+
   setTimeout(()=>cardWrap.style.display="flex",8000);
   setInterval(()=>explode(Math.random()*canvas.width,Math.random()*canvas.height/2),900);
 }
