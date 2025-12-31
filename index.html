@@ -40,14 +40,12 @@ h1{
 
 .name{
   margin-top:10px;
-  font-size:1.3rem;
+  font-size:1.5rem;
   color:#ffd6f3;
+  min-height:32px;
 }
 
-p{
-  margin-top:15px;
-  opacity:.9;
-}
+p{margin-top:15px;opacity:.9}
 
 #love{
   display:none;
@@ -56,8 +54,7 @@ p{
   font-size:3rem;
   color:#ff9de2;
   text-shadow:0 0 25px #ff4ecd;
-  animation:glow 2s infinite alternate;
-  animation:pop 1s ease forwards;
+  animation:pop 1s ease forwards, glow 2s infinite alternate;
 }
 
 #message{
@@ -86,12 +83,10 @@ button{
   from{text-shadow:0 0 10px #ff4ecd}
   to{text-shadow:0 0 35px #ff9de2}
 }
-
 @keyframes pop{
   from{transform:scale(0);opacity:0}
   to{transform:scale(1);opacity:1}
 }
-
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(10px)}
   to{opacity:1;transform:translateY(0)}
@@ -101,29 +96,25 @@ button{
 .heart{
   position:absolute;
   font-size:22px;
-  cursor:pointer;
   animation:floatUp linear infinite;
 }
-
 @keyframes floatUp{
   from{transform:translateY(100vh);opacity:1}
   to{transform:translateY(-10vh);opacity:0}
 }
 
-/* Sparkle */
+/* Sparkle cursor */
 .sparkle{
   position:absolute;
   font-size:14px;
   pointer-events:none;
   animation:spark 1s linear forwards;
 }
-
 @keyframes spark{
   from{opacity:1;transform:scale(1)}
   to{opacity:0;transform:scale(0)}
 }
 
-/* Fireworks */
 canvas{
   position:absolute;
   inset:0;
@@ -138,7 +129,8 @@ canvas{
 
 <div class="center">
   <h1>Happy New Year ✨</h1>
-  <div class="name">Dear Lipsy 💖</div>
+  <div class="name" id="name"></div>
+
   <p>This year felt beautiful because of you</p>
   <p>I hope this year brings us closer 🌸</p>
 
@@ -148,14 +140,12 @@ canvas{
   <div id="message"></div>
 </div>
 
-<!-- Romantic Music (Plays ONLY after click) -->
-<audio id="music" loop>
-  <source src="https://cdn.pixabay.com/audio/2023/03/06/audio_5e2c6db0b1.mp3" type="audio/mpeg">
-</audio>
+<!-- YouTube Music -->
+<iframe id="ytMusic" width="0" height="0" allow="autoplay"></iframe>
 
 <script>
-// HEARTS
-function createHeart(){
+// ❤️ FLOATING HEARTS
+setInterval(()=>{
   const h=document.createElement("div");
   h.className="heart";
   h.innerHTML="❤️";
@@ -163,32 +153,45 @@ function createHeart(){
   h.style.animationDuration=(4+Math.random()*3)+"s";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),7000);
-}
-setInterval(createHeart,300);
+},300);
 
-// LOVE ACTION
+// 💌 NAME TYPING
+const nameText="Dear Lipsy 💖";
+let ni=0;
+function typeName(){
+  if(ni<nameText.length){
+    document.getElementById("name").innerHTML+=nameText[ni++];
+    setTimeout(typeName,120);
+  }
+}
+typeName();
+
+// 💕 START LOVE
 function startLove(){
   document.getElementById("love").style.display="block";
-  document.getElementById("music").play();
 
-  const msg = "From the first smile to every little moment, you made my year brighter. I wish to start this new year holding your hand, writing our story together, one heartbeat at a time. 💞";
+  // Die With A Smile – YouTube
+  document.getElementById("ytMusic").src=
+    "https://www.youtube.com/embed/kPa7bsKwL-c?autoplay=1&loop=1&playlist=kPa7bsKwL-c";
+
+  startAudioSync();
+
+  const msg="From the first smile to every little moment, you made my year brighter. I wish to start this new year holding your hand, writing our story together, one heartbeat at a time. 💞";
   const box=document.getElementById("message");
   box.style.display="block";
-  typeText(msg, box);
+  typeText(msg,box);
 }
 
-// TYPEWRITER
-function typeText(text, el){
-  let i=0;
-  el.innerHTML="";
-  const interval=setInterval(()=>{
-    el.innerHTML+=text[i];
-    i++;
-    if(i>=text.length) clearInterval(interval);
+// ✍️ MESSAGE TYPE
+function typeText(text,el){
+  let i=0; el.innerHTML="";
+  const t=setInterval(()=>{
+    el.innerHTML+=text[i++];
+    if(i>=text.length) clearInterval(t);
   },40);
 }
 
-// SPARKLE CURSOR
+// ✨ SPARKLE CURSOR
 document.addEventListener("mousemove",e=>{
   const s=document.createElement("div");
   s.className="sparkle";
@@ -199,39 +202,48 @@ document.addEventListener("mousemove",e=>{
   setTimeout(()=>s.remove(),1000);
 });
 
-// FIREWORKS
+// 🎆 FIREWORKS + MUSIC SYNC
 const canvas=document.getElementById("fireworks");
 const ctx=canvas.getContext("2d");
 canvas.width=innerWidth;
 canvas.height=innerHeight;
-let parts=[];
+let particles=[];
 
-function firework(x,y){
-  for(let i=0;i<60;i++){
-    parts.push({
+function explode(x,y,power){
+  for(let i=0;i<power;i++){
+    particles.push({
       x,y,
       a:Math.random()*Math.PI*2,
-      s:Math.random()*5+2,
-      l:100
+      s:Math.random()*6+2,
+      l:80
     });
   }
 }
 
 function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  parts.forEach((p,i)=>{
+  particles.forEach((p,i)=>{
     p.x+=Math.cos(p.a)*p.s;
     p.y+=Math.sin(p.a)*p.s;
     p.l--;
-    ctx.fillStyle="rgba(255,120,200,0.8)";
+    ctx.fillStyle="rgba(255,120,200,0.9)";
     ctx.fillRect(p.x,p.y,3,3);
-    if(p.l<=0) parts.splice(i,1);
+    if(p.l<=0) particles.splice(i,1);
   });
   requestAnimationFrame(animate);
 }
-
-setInterval(()=>firework(Math.random()*canvas.width,Math.random()*canvas.height/2),900);
 animate();
+
+// 🎵 FAKE AUDIO SYNC (beat pulse)
+let beat=0;
+function startAudioSync(){
+  setInterval(()=>{
+    beat=Math.random();
+    if(beat>0.6){
+      explode(Math.random()*canvas.width,Math.random()*canvas.height/2,80);
+    }
+  },200);
+}
 
 window.onresize=()=>{
   canvas.width=innerWidth;
@@ -241,5 +253,3 @@ window.onresize=()=>{
 
 </body>
 </html>
-
-
